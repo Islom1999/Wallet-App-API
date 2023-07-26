@@ -75,7 +75,14 @@ export class WalletService {
             throw new HttpException('Kirimlar topilmadi', HttpStatus.NOT_FOUND);
         }
 
-        const total = await this.prismaService.kirim.aggregate({
+        let total = await this.prismaService.kirim.aggregate({
+            where: {
+                createdAt: {
+                    gte: dateStart,
+                    lte: dateEnd,
+                  },
+                  userId: +userId
+            },
             _avg: {
                 amount: true,
             },
@@ -135,7 +142,14 @@ export class WalletService {
             throw new HttpException('Chiqimlar topilmadi', HttpStatus.NOT_FOUND);
         }
 
-        const total = await this.prismaService.chiqim.aggregate({
+        let total = await this.prismaService.chiqim.aggregate({
+            where: {
+                createdAt: {
+                    gte: dateStart,
+                    lte: dateEnd,
+                  },
+                  userId: +userId
+            },
             _avg: {
                 amount: true,
             },
@@ -148,7 +162,7 @@ export class WalletService {
         })
 
         const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
-
+        
         return {code:200, message: "Get All Chiqim", totalData, data:chiqim} 
     }
 
