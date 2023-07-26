@@ -4,6 +4,8 @@ import { KirimDto } from './dto/kirim.dto';
 import { ChiqimDto } from './dto/chiqim.dto';
 import { QueryDto } from './dto/query.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
+import { GetCurrentUserId } from 'src/decorators/get.userId';
 
 @Controller('wallet')
 export class WalletController {
@@ -25,22 +27,23 @@ export class WalletController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('/kirim/')
-  async getAllKirim(@Query() query: QueryDto){
-    const kirim = await this.walletService.getAllKirim(query);
+  async getAllKirim(@Query() query: QueryDto, @GetCurrentUserId() userId: number ){
+    const kirim = await this.walletService.getAllKirim(query, userId);
     return kirim
   }
 
+  
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
   @Post('kirim/create')
-  async createKirim(@Body() kirim: KirimDto) {
-    return await this.walletService.createKirim(kirim)
+  async createKirim(@Body() kirim: KirimDto, @GetCurrentUserId() userId: number) {
+    return await this.walletService.createKirim(kirim, userId)
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt')) 
   @Get('/chiqim/')
-  async getAllChiqim(@Query() query: QueryDto){
-    const chiqim = await this.walletService.getAllChiqim(query);
+  async getAllChiqim(@Query() query: QueryDto, @GetCurrentUserId() userId: number ){
+    const chiqim = await this.walletService.getAllChiqim(query, userId);
     if(!chiqim){
       throw new HttpException('Chiqimlar topilmadi', HttpStatus.NOT_FOUND);
     }
@@ -50,7 +53,7 @@ export class WalletController {
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
   @Post('chiqim/create')
-  async createChiqim(@Body() chiqim: ChiqimDto) {
-    return await this.walletService.createChiqim(chiqim)
+  async createChiqim(@Body() chiqim: ChiqimDto, @GetCurrentUserId() userId: number) {
+    return await this.walletService.createChiqim(chiqim, userId)
   }
 }

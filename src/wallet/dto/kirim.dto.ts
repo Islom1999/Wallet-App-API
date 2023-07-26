@@ -12,8 +12,4 @@ export class KirimDto{
     @IsNumber()
     @IsNotEmpty()
     tushumId  : number
-
-    @IsNumber()
-    @IsNotEmpty()
-    userId    : number
 }

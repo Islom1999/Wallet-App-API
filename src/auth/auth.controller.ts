@@ -1,9 +1,9 @@
-import { Controller, Post, Body, UseGuards, Req, Res, UsePipes, ValidationPipe} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, UsePipes, ValidationPipe} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import {Request, Response} from 'express'
+import { GetCurrentUserId } from 'src/decorators/get.userId';
 
 @Controller('auth')
 export class AuthController {
@@ -19,22 +19,20 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() loginDto: LoginDto, 
-    // @Req() request,
-    // @Res() response: Response
   ) {
     const user = await this.authService.login(loginDto);
-
-    // request.session.user = user
-    // response.cookie('user', 'value')
-
     return user;
+  }
+
+  @Post('logout')
+  @UseGuards(AuthGuard('jwt'))
+  async logout( @GetCurrentUserId() userId: number ) {
+    return this.authService.logout(userId);
   }
 
   @Post('protected')
   @UseGuards(AuthGuard('jwt'))
   async protectedRoute() {
-    // console.log(request.session)
-    // console.log(request.cookies); 
     return { 
       message: 'Siz autentifikatsiyadan o\'tdingiz', 
     };

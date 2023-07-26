@@ -48,6 +48,21 @@ export class AuthService {
     return {code: 201, message: "User Logined Token Seted", data: user};
   }
 
+  async logout(userId: number) {
+    await this.prismaService.user.updateMany({
+      where: {
+        id: userId,
+        token: {
+          not: null,
+        },
+      },
+      data: {
+        token: null,
+      },
+    });
+    return {code: 204, message: "User logout",};
+  }
+
   async generateToken(user: any): Promise<string> {
     return this.jwtService.sign(user);
   }

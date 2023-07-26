@@ -12,8 +12,4 @@ export class ChiqimDto{
     @IsNumber()
     @IsNotEmpty()
     xarajatId : number
-
-    @IsNumber()
-    @IsNotEmpty()
-    userId    : number
 }

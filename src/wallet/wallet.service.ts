@@ -1,8 +1,9 @@
-import { Injectable, HttpException, HttpStatus, Query } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Query, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { KirimDto } from './dto/kirim.dto';
 import { ChiqimDto } from './dto/chiqim.dto';
 import { QueryDto } from './dto/query.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 @Injectable()
 export class WalletService {
@@ -11,7 +12,14 @@ export class WalletService {
     
     async getAllKirimCategory(){
         const category = await this.prismaService.tushumlar.findMany()
-        if(!category){
+        .catch((error) => {
+            if (error instanceof PrismaClientKnownRequestError) {
+                throw new HttpException('Prisma Error', HttpStatus.NOT_MODIFIED);
+            }
+            throw error;
+        });
+
+        if(!category[0]){
             throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
           }
         return {
@@ -23,7 +31,7 @@ export class WalletService {
 
     async getAllChiqimCategory(){   
         const category = await this.prismaService.xarajatlar.findMany()
-        if(!category){
+        if(!category[0]){
             throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
           }
         return {
@@ -33,8 +41,7 @@ export class WalletService {
         }
     }
 
-    async getAllKirim(@Query() query: QueryDto){
-        const userId = query.userId
+    async getAllKirim(@Query() query: QueryDto, userId: number){
         const dateStart = new Date(query.dateStart)
         const dateEnd = new Date(query.dateEnd)
 
@@ -63,27 +70,42 @@ export class WalletService {
                 }
             },
         })
+
         if(Boolean(!kirim[0])){
             throw new HttpException('Kirimlar topilmadi', HttpStatus.NOT_FOUND);
-          }
-        return {code:200, message: "Get All Kirim", data:kirim}
+        }
+
+        const total = await this.prismaService.kirim.aggregate({
+            _avg: {
+                amount: true,
+            },
+            _count: {
+                amount: true,
+            },
+            _sum: {
+                amount: true,
+            }
+        })
+
+        const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
+
+        return {code:200, message: "Get All Kirim", totalData, data:kirim}
     }
 
-    async createKirim(kirim: KirimDto) {
-        const newKirim = await this.prismaService.kirim.create({data: kirim})
+    async createKirim(kirim: KirimDto, userId: number) {
+        const newKirim = await this.prismaService.kirim.create({data: {...kirim, userId}})
         return {
             code:201, 
             message: 'Created Kirim',
             data: newKirim
-        }
+        }     
     }
 
-    async getAllChiqim(@Query() query: QueryDto){
-        const userId = query.userId
+    async getAllChiqim(@Query() query: QueryDto, userId: number){
         const dateStart = new Date(query.dateStart)
         const dateEnd = new Date(query.dateEnd)
 
-        let kun = dateEnd.getDate() + 1
+        let kun = dateEnd.getDate() + 1 
         dateEnd.setDate(kun)
 
         const chiqim = await this.prismaService.chiqim.findMany({
@@ -110,13 +132,28 @@ export class WalletService {
         })
 
         if(Boolean(!chiqim[0])){
-            throw new HttpException('Kirimlar topilmadi', HttpStatus.NOT_FOUND);
+            throw new HttpException('Chiqimlar topilmadi', HttpStatus.NOT_FOUND);
         }
-        return {code:200, message: "Get All Chiqim", data:chiqim} 
+
+        const total = await this.prismaService.chiqim.aggregate({
+            _avg: {
+                amount: true,
+            },
+            _count: {
+                amount: true,
+            },
+            _sum: {
+                amount: true,
+            }
+        })
+
+        const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
+
+        return {code:200, message: "Get All Chiqim", totalData, data:chiqim} 
     }
 
-    async createChiqim(chiqim: ChiqimDto) {
-        const newChiqim = await this.prismaService.chiqim.create({data: chiqim})
+    async createChiqim(chiqim: ChiqimDto, userId: number) {
+        const newChiqim = await this.prismaService.chiqim.create({data: {...chiqim, userId}})
         return {
             code:201, 
             message: 'Created Kirim',

@@ -8,4 +8,4 @@ import { WalletModule } from './wallet/wallet.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {}  
