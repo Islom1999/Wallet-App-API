@@ -38,7 +38,11 @@ docker compose up
 ## Projectni ishga tushirish
 
 ```bash
-$ npm run start:dev
+npx prisma migrate dev --name init
+
+npx prisma generate
+
+npm run start:dev
 ```
 
 ## Project Docs
