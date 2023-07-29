@@ -2,7 +2,7 @@ version: '3.8'
 services:
   db:
     image: postgres:13
-    container_name: postgress
+    container_name: postgres-db
     restart: always
     ports:
       - 5433:5432
