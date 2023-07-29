@@ -56,4 +56,23 @@ export class WalletController {
   async createChiqim(@Body() chiqim: ChiqimDto, @GetCurrentUserId() userId: number) {
     return await this.walletService.createChiqim(chiqim, userId)
   }
+
+  // by categoryId filters
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/kirim/bycategory/')
+  async getAllKirimById(@Query() query: QueryDto, @GetCurrentUserId() userId: number ){
+    const kirim = await this.walletService.getAllKirimById(query, userId);
+    return kirim
+  }
+
+  @UseGuards(AuthGuard('jwt')) 
+  @Get('/chiqim/bycategory/')
+  async getAllChiqimById(@Query() query: QueryDto, @GetCurrentUserId() userId: number ){
+    const chiqim = await this.walletService.getAllChiqimById(query, userId);
+    if(!chiqim){
+      throw new HttpException('Chiqimlar topilmadi', HttpStatus.NOT_FOUND);
+    }
+    return chiqim
+  }
 }

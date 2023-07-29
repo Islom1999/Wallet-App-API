@@ -54,7 +54,7 @@ export class WalletService {
                   gte: dateStart,
                   lte: dateEnd,
                 },
-                userId: +userId
+                userId: +userId,
             },
             include: {
                 user: {
@@ -80,8 +80,8 @@ export class WalletService {
                 createdAt: {
                     gte: dateStart,
                     lte: dateEnd,
-                  },
-                  userId: +userId
+                },
+                userId: +userId,
             },
             _avg: {
                 amount: true,
@@ -90,7 +90,7 @@ export class WalletService {
                 amount: true,
             },
             _sum: {
-                amount: true,
+                amount: true, 
             }
         })
 
@@ -174,5 +174,132 @@ export class WalletService {
             data: newChiqim
         }
     }
+
+    //  by category
+
+    async getAllKirimById(@Query() query: QueryDto, userId: number){
+        const dateStart = new Date(query.dateStart)
+        const dateEnd = new Date(query.dateEnd)
+        const categoryId = query.categoryId
+
+        let kun = dateEnd.getDate() + 1
+        dateEnd.setDate(kun)
+
+        const kirim = await await this.prismaService.kirim.findMany({
+            where: {
+                createdAt: {
+                  gte: dateStart,
+                  lte: dateEnd,
+                },
+                userId: +userId,
+                tushumId: +categoryId
+            },
+            include: {
+                user: {
+                    select: {
+                        fullName: true,
+                        email: true,
+                    },
+                },
+                tushum: {
+                    select: {
+                        title: true,
+                    },
+                }
+            },
+        })
+
+        if(Boolean(!kirim[0])){
+            throw new HttpException('Kirimlar topilmadi', HttpStatus.NOT_FOUND);
+        }
+
+        let total = await this.prismaService.kirim.aggregate({
+            where: {
+                createdAt: {
+                    gte: dateStart,
+                    lte: dateEnd,
+                },
+                userId: +userId,
+                tushumId: +categoryId
+            },
+            _avg: {
+                amount: true,
+            },
+            _count: {
+                amount: true,
+            },
+            _sum: {
+                amount: true, 
+            }
+        })
+
+        const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
+
+        return {code:200, message: "Get All Kirim", totalData, data:kirim}
+    }
+
+    async getAllChiqimById(@Query() query: QueryDto, userId: number){
+        const dateStart = new Date(query.dateStart)
+        const dateEnd = new Date(query.dateEnd)
+        const categoryId = query.categoryId
+
+        console.log(categoryId)
+
+        let kun = dateEnd.getDate() + 1 
+        dateEnd.setDate(kun)
+
+        const chiqim = await this.prismaService.chiqim.findMany({
+            where: {
+                createdAt: {
+                  gte: dateStart,
+                  lte: dateEnd,
+                },
+                userId: +userId,
+                xarajatId: +categoryId
+            },
+            include: {
+                user: {
+                    select: {
+                        fullName: true,
+                        email: true,
+                    },
+                },
+                xarajat: {
+                    select: {
+                        title: true,
+                    },
+                }
+            },
+        })
+
+        if(Boolean(!chiqim[0])){
+            throw new HttpException('Chiqimlar topilmadi', HttpStatus.NOT_FOUND);
+        }
+
+        let total = await this.prismaService.chiqim.aggregate({
+            where: {
+                createdAt: {
+                    gte: dateStart,
+                    lte: dateEnd,
+                  },
+                  userId: +userId,
+                  xarajatId: +categoryId
+            },
+            _avg: {
+                amount: true,
+            },
+            _count: {
+                amount: true,
+            },
+            _sum: {
+                amount: true,
+            }
+        })
+
+        const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
+        
+        return {code:200, message: "Get All Chiqim", totalData, data:chiqim} 
+    }
+
 }
  
