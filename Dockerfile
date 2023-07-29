@@ -1,15 +1,17 @@
-FROM node:14
+FROM node:16
 
-WORKDIR /app
+WORKDIR /islom/src/app
 
-COPY package.json package-lock.json ./
-
-RUN npm install
+COPY package*.json ./
 
 COPY . .
 
-RUN npx prisma generate
+RUN npm i
+RUN npm run build
+
+# RUN npx prisma migrate dev --name init
+# RUN npx prisma generate
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start:dev"]
+CMD ["node", "dist/main"]

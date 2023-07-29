@@ -1,20 +1,21 @@
 version: '3.8'
 services:
-  # app:
-  #   image: islomdev/nest-wallet-app
-  #   ports:
-  #     - 3000:3000
-  #   environment:
-  #     - DATABASE_URL=postgres://postgres:123@db:5435/nestjs
-  #   depends_on:
-  #     - db
   db:
     image: postgres:13
-    container_name: postgres
+    container_name: postgress
     restart: always
     ports:
-      - 5435:5432
+      - 5433:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: nestjs
+  # app: 
+  #   build: './' 
+  #   image: wallet-app
+  #   container_name: wallet-app
+  #   restart: always
+  #   ports:
+  #     - 3000:3000
+  #   env_file:
+  #     - .env_deployment
