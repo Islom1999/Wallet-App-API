@@ -4,6 +4,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { PrismaService } from 'src/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { updateFullNameDto, updatePasswordDto  } from './dto/update.dto';
 
 @Injectable()
 export class AuthService {
@@ -61,6 +62,55 @@ export class AuthService {
       },
     });
     return {code: 204, message: "User logout",};
+  }
+
+  async getProfile (userId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: {id: userId},
+      select: {
+        id: true,
+        fullName: true, 
+        email: true,
+        token: true,
+      }
+    });
+    return {code: 200, data: user,};
+  }
+
+  async updateProfileFullname (userId: number, updateDto: updateFullNameDto) {
+    const { fullName } = updateDto
+    const user = await this.prismaService.user.update({
+      where: {id: userId},
+      data: {fullName}
+    });
+
+    return {code: 200, data: user,};
+  }
+
+  async updateProfilePassword(userId: number, updateDto: updatePasswordDto) {
+
+    const { password, newPassword } = updateDto
+
+    const user = await this.prismaService.user.findUnique({
+      where: {id: userId},
+    });
+
+    const valid = await bcrypt.compare(password, user.password);
+
+    if(!valid){
+        throw new HttpException('Invalid password', HttpStatus.BAD_REQUEST);
+    }
+
+    
+    const token = await this.generateToken({name: user.fullName, email: user.email});
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    
+    const uptadeUser = await this.prismaService.user.update({data: {token, password: passwordHash}, where: {email: user.email} });
+
+    user.password = undefined
+
+    return {code: 200, data: uptadeUser,};
   }
 
   async generateToken(user: any): Promise<string> {

@@ -1,9 +1,10 @@
-import { Controller, Post, Body, UseGuards, UsePipes, ValidationPipe} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, UsePipes, ValidationPipe, Get} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { GetCurrentUserId } from 'src/decorators/get.userId';
+import { updateFullNameDto, updatePasswordDto } from './dto/update.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -36,5 +37,25 @@ export class AuthController {
     return { 
       message: 'Siz autentifikatsiyadan o\'tdingiz', 
     };
+  }
+
+  @Get('profile')
+  @UseGuards(AuthGuard('jwt'))
+  async getProfile( @GetCurrentUserId() userId: number ) {
+    return this.authService.getProfile(userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post('profile/update/fullname')
+  @UseGuards(AuthGuard('jwt'))
+  async updateProfileFullname( @GetCurrentUserId() userId: number, @Body() updateDto: updateFullNameDto) {
+    return this.authService.updateProfileFullname(userId, updateDto);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post('profile/update/password')
+  @UseGuards(AuthGuard('jwt'))
+  async updateProfilePassword( @GetCurrentUserId() userId: number, @Body() updateDto: updatePasswordDto) {
+    return this.authService.updateProfilePassword(userId, updateDto);
   }
 }

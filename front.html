@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <script>
+        const register = async() => {
+            const {data} = await axios.post('http://100.26.102.168:4000/api/auth/register', {
+                fullName: "Islom",
+                email: "test@gmail.com",
+                password: "password"
+            }, {
+                headers: {
+                'Content-Type': 'application/json'
+            }
+            })
+            console.log(data)
+        }
+
+        const login = async() => {
+            const {data} = await axios.post('http://100.26.102.168:4000/api/auth/login', {
+                email: "test@gmail.com",
+                password: "password"
+            }, {
+                headers: {
+                'Content-Type': 'application/json'
+            }
+            })
+            console.log(data)
+            console.log(`Token => "Bearer ${data.data.token}"`)
+        }
+
+        const getCategory = async() => {
+            const {data} = await axios.get('http://100.26.102.168:4000/api/wallet/kirim/category', {
+                headers: {
+                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSXNsb20iLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwiaWF0IjoxNjkxMTQ0ODAwLCJleHAiOjE2OTEyMzEyMDB9.FX2aBx2J8pJTBEL3C5C5G_GSzy4Ww6jve6uT1HrdLEE'
+                }
+            })
+            console.log(data)
+        }
+
+        getCategory()
+        // register()
+        // login()
+    </script>
+</body>
+</html>
