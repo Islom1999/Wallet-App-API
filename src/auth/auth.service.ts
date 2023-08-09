@@ -98,7 +98,7 @@ export class AuthService {
     const valid = await bcrypt.compare(password, user.password);
 
     if(!valid){
-        throw new HttpException('Invalid password', HttpStatus.BAD_REQUEST);
+        throw new HttpException('Paroliz xato', HttpStatus.BAD_REQUEST);
     }
 
     

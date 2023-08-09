@@ -7,7 +7,7 @@ export class ChiqimDto{
 
     @IsNumber()
     @IsNotEmpty()
-    amount    : number
+    amount : number
 
     @IsNumber()
     @IsNotEmpty()
