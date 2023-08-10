@@ -20,11 +20,11 @@ export class WalletService {
         });
 
         if(!category[0]){
-            throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
+            throw new HttpException('Kategoriyalar topilmadi', HttpStatus.NOT_FOUND);
           }
         return {
             code:200, 
-            message: 'Kirim category finded',
+            message: 'Kategoriyalar topildi',
             data: category
         }
     }
@@ -32,11 +32,11 @@ export class WalletService {
     async getAllChiqimCategory(){   
         const category = await this.prismaService.xarajatlar.findMany()
         if(!category[0]){
-            throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
+            throw new HttpException('Kategoriyalar topilmadi', HttpStatus.NOT_FOUND);
           }
         return {
             code:200, 
-            message: 'Chiqim category finded',
+            message: 'Barcha kategoriyalar topildi',
             data: category
         }
     }
@@ -96,14 +96,14 @@ export class WalletService {
 
         const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
 
-        return {code:200, message: "Get All Kirim", totalData, data:kirim}
+        return {code:200, message: "Barcha kirimlar", totalData, data:kirim}
     }
 
     async createKirim(kirim: KirimDto, userId: number) {
         const newKirim = await this.prismaService.kirim.create({data: {...kirim, userId}})
         return {
             code:201, 
-            message: 'Created Kirim',
+            message: 'Kirim yaratildi',
             data: newKirim
         }     
     }
@@ -163,14 +163,14 @@ export class WalletService {
 
         const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
         
-        return {code:200, message: "Get All Chiqim", totalData, data:chiqim} 
+        return {code:200, message: "Barcha Chiqimlar", totalData, data:chiqim} 
     }
 
     async createChiqim(chiqim: ChiqimDto, userId: number) {
         const newChiqim = await this.prismaService.chiqim.create({data: {...chiqim, userId}})
         return {
             code:201, 
-            message: 'Created Kirim',
+            message: 'Chiqim yaratildi',
             data: newChiqim
         }
     }
@@ -235,7 +235,7 @@ export class WalletService {
 
         const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
 
-        return {code:200, message: "Get All Kirim", totalData, data:kirim}
+        return {code:200, message: "Barcha kirimlar", totalData, data:kirim}
     }
 
     async getAllChiqimById(@Query() query: QueryDto, userId: number){
@@ -298,7 +298,42 @@ export class WalletService {
 
         const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
         
-        return {code:200, message: "Get All Chiqim", totalData, data:chiqim} 
+        return {code:200, message: "Barcha Chiqimlar", totalData, data:chiqim} 
+    }
+
+    // delete wallet item
+    async deleteChiqim(deleteId: string | number, userId: number) {
+        deleteId = +deleteId
+        const chiqim = await this.prismaService.chiqim.findUnique({where: {id: deleteId}})
+        if(!chiqim){
+            throw new HttpException('Chiqim topilmadi', HttpStatus.NOT_FOUND)
+        }
+        if(chiqim.userId != userId){
+            throw new HttpException('Bu chiqim sizga tegishli emas uni o\'chira olmaysiz', HttpStatus.BAD_REQUEST)
+        }
+        const deleteChiqim = await this.prismaService.chiqim.delete({where: {id:deleteId}})
+        return {
+            code:200, 
+            message: 'Chiqim o\'chirildi',
+            data: deleteChiqim
+        }
+    }
+
+    async deleteKirim(deleteId: string | number, userId: number) {
+        deleteId = +deleteId
+        const chiqim = await this.prismaService.chiqim.findUnique({where: {id: deleteId}})
+        if(!chiqim){
+            throw new HttpException('Kirim topilmadi', HttpStatus.NOT_FOUND)
+        }
+        if(chiqim.userId != userId){
+            throw new HttpException('Bu kirim sizga tegishli emas uni o\'chira olmaysiz', HttpStatus.BAD_REQUEST)
+        }
+        const deleteChiqim = await this.prismaService.chiqim.delete({where: {id:deleteId}})
+        return {
+            code:200, 
+            message: 'Kirim o\'chirildi',
+            data: deleteChiqim
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, UseGuards, HttpException, HttpStatus, UsePipes, ValidationPipe, Query } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, HttpException, HttpStatus, UsePipes, ValidationPipe, Query, Delete, Param } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { KirimDto } from './dto/kirim.dto';
 import { ChiqimDto } from './dto/chiqim.dto';
@@ -74,5 +74,27 @@ export class WalletController {
       throw new HttpException('Chiqimlar topilmadi', HttpStatus.NOT_FOUND);
     }
     return chiqim
+  }
+
+  // delete wallet items
+
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('chiqim/:id')
+  async deleteChiqim(
+    @Param('id') id: string,
+    @GetCurrentUserId() userId: number
+  ) {
+    return await this.walletService.deleteChiqim(id, userId)
+  }
+
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('chiqim/:id')
+  async deleteKirim(
+    @Param('id') id: string,
+    @GetCurrentUserId() userId: number  
+  ) {
+    return await this.walletService.deleteKirim(id, userId)
   }
 }

@@ -14,7 +14,7 @@ export class AuthService {
   async register(register: RegisterDto): Promise<any> {
     const user = await this.prismaService.user.findUnique({ where: { email: register.email } });
     if(user){
-        throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+        throw new HttpException('User oldindan yaratilgan boshqa email kiriting', HttpStatus.BAD_REQUEST);
     }
     const password = await bcrypt.hash(register.password, 10);
     const data = {
@@ -24,20 +24,20 @@ export class AuthService {
     }
     const newUser = await this.prismaService.user.create({data})
     
-    return {status: 200, message: "User Registrated", data: newUser};
+    return {status: 200, message: "User ro'yhatdan o'tdi", data: newUser};
   }
 
   async login(loginDto: LoginDto): Promise<any> {
     let user = await this.prismaService.user.findUnique({ where: { email: loginDto.email } });
 
     if(!user){
-        throw new HttpException('User not found', HttpStatus.NOT_FOUND); 
+        throw new HttpException('User topilmadi', HttpStatus.NOT_FOUND); 
     }
 
     const valid = await bcrypt.compare(loginDto.password, user.password);
 
     if(!valid){
-        throw new HttpException('Invalid password', HttpStatus.BAD_REQUEST);
+        throw new HttpException('Parol xato', HttpStatus.BAD_REQUEST);
     }
 
     const token = await this.generateToken({name: user.fullName, email: user.email});
@@ -46,7 +46,7 @@ export class AuthService {
 
     user.password = undefined
 
-    return {code: 201, message: "User Logined Token Seted", data: user};
+    return {code: 201, message: "User tizimga kirdi", data: user};
   }
 
   async logout(userId: number) {
@@ -61,7 +61,7 @@ export class AuthService {
         token: null,
       },
     });
-    return {code: 204, message: "User logout",};
+    return {code: 204, message: "Tizimdan chiqildi",};
   }
 
   async getProfile (userId: number) {
@@ -74,7 +74,7 @@ export class AuthService {
         token: true,
       }
     });
-    return {code: 200, data: user,};
+    return {code: 200, data: user, message: 'Profile malumotlari berildi'};
   }
 
   async updateProfileFullname (userId: number, updateDto: updateFullNameDto) {
@@ -84,7 +84,7 @@ export class AuthService {
       data: {fullName}
     });
 
-    return {code: 200, data: user,};
+    return {code: 200, data: user, message: "Ism familiya yangilandi",};
   }
 
   async updateProfilePassword(userId: number, updateDto: updatePasswordDto) {
@@ -98,7 +98,7 @@ export class AuthService {
     const valid = await bcrypt.compare(password, user.password);
 
     if(!valid){
-        throw new HttpException('Paroliz xato', HttpStatus.BAD_REQUEST);
+        throw new HttpException('Eski paroliz xato', HttpStatus.BAD_REQUEST);
     }
 
     
@@ -110,7 +110,7 @@ export class AuthService {
 
     user.password = undefined
 
-    return {code: 200, data: uptadeUser,};
+    return {code: 200, data: uptadeUser, message: "Parol yangilandi"};
   }
 
   async generateToken(user: any): Promise<string> {
