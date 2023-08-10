@@ -80,7 +80,7 @@ export class WalletController {
 
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
-  @Delete('chiqim/:id')
+  @Delete('/chiqim/:id')
   async deleteChiqim(
     @Param('id') id: string,
     @GetCurrentUserId() userId: number
@@ -90,7 +90,7 @@ export class WalletController {
 
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
-  @Delete('chiqim/:id')
+  @Delete('/kirim/:id')
   async deleteKirim(
     @Param('id') id: string,
     @GetCurrentUserId() userId: number  
