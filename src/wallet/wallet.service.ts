@@ -321,18 +321,18 @@ export class WalletService {
 
     async deleteKirim(deleteId: string | number, userId: number) {
         deleteId = +deleteId
-        const chiqim = await this.prismaService.chiqim.findUnique({where: {id: deleteId}})
-        if(!chiqim){
+        const kirim = await this.prismaService.kirim.findUnique({where: {id: deleteId}})
+        if(!kirim){
             throw new HttpException('Kirim topilmadi', HttpStatus.NOT_FOUND)
         }
-        if(chiqim.userId != userId){
+        if(kirim.userId != userId){
             throw new HttpException('Bu kirim sizga tegishli emas uni o\'chira olmaysiz', HttpStatus.BAD_REQUEST)
         }
-        const deleteChiqim = await this.prismaService.chiqim.delete({where: {id:deleteId}})
+        const deleteKirim = await this.prismaService.kirim.delete({where: {id:deleteId}})
         return {
             code:200, 
             message: 'Kirim o\'chirildi',
-            data: deleteChiqim
+            data: deleteKirim
         }
     }
 
