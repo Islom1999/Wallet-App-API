@@ -23,7 +23,6 @@ jobs:
         script: |
           cd Wallet-App-API/  
           git pull
-          rm -r node_modules/
           npm i
           npm run build
           pm2 restart wallet-app
