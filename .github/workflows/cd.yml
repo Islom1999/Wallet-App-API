@@ -22,8 +22,8 @@ jobs:
         password: ${{ env.SSH_PRIVATE_KEY }}
         # port: 22
         script: |
-          pm2 restart wallet-app
-
-# cd ./Wallet-App-API
+          cd Wallet-App-API/  
+          
+# pm2 restart wallet-app
 # git pull
 # npm install
