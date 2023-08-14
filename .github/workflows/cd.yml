@@ -24,6 +24,5 @@ jobs:
           cd Wallet-App-API/  
           git pull
           npm install
-          npx prisma generate
           npm run build
           pm2 restart wallet-app
