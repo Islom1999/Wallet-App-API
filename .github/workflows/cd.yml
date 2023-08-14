@@ -5,9 +5,9 @@ on:
     branches: [ master ]
 
 env:
-  SERVER_HOST: ${{ secrets.HOST }}
-  SERVER_USERNAME: ${{ secrets.USERNAME }}
-  SSH_PRIVATE_KEY: ${{ secrets.PASSWORD }}
+  SERVER_HOST: 34.239.114.247
+  SERVER_USERNAME: ubuntu
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
       with:
         host: ${{ env.SERVER_HOST }}
         username: ${{ env.SERVER_USERNAME }}
-        password: ${{ env.SSH_PRIVATE_KEY }}
+        key: ${{ env.SSH_PRIVATE_KEY }}
         # port: 22
         # script: |
         #   cd Wallet-App-API/  
