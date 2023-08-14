@@ -17,7 +17,7 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: 22
         script: |
-          cd ~/Wallet-App-API
+          cd ./Wallet-App-API
           git pull
           npm install
           pm2 restart wallet-app
