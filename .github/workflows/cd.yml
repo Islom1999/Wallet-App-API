@@ -22,6 +22,9 @@ jobs:
         key: ${{ env.SSH_PRIVATE_KEY }}
         script: |
           cd Wallet-App-API/  
-          pm2 restart wallet-app
           git pull
           npm install
+          npx prisma migrate dev
+          npx prisma generate
+          npm run build
+          pm2 restart wallet-app
