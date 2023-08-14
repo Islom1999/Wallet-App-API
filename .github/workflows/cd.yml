@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 env:
-  SERVER_HOST: 34.239.114.247
+  SERVER_HOST: 13.51.121.149
   SERVER_USERNAME: ubuntu
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
