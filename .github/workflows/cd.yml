@@ -20,10 +20,8 @@ jobs:
         host: ${{ env.SERVER_HOST }}
         username: ${{ env.SERVER_USERNAME }}
         key: ${{ env.SSH_PRIVATE_KEY }}
-        # port: 22
-        # script: |
-        #   cd Wallet-App-API/  
-
-# pm2 restart wallet-app
-# git pull
-# npm install
+        script: |
+          cd Wallet-App-API/  
+          pm2 restart wallet-app
+          git pull
+          npm install
