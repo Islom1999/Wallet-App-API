@@ -25,9 +25,8 @@ jobs:
         script: |
           cd ~/Wallet-App-API/
           git pull
-          node -v
-          npm -v
           npm install
+          npx prisma migrate dev
+          npx prisma generate
           npm run build
-
-# pm2 restart wallet-app
+          pm2 restart wallet-app
