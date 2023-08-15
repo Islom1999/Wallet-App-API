@@ -38,9 +38,9 @@ jobs:
         script: |
           cd ~/Wallet-App-API/
           git pull
-          /usr/bin/node -v
-          /usr/bin/npm -v
-          /usr/bin/npm install
-          /usr/bin/npm run build
+          node -v
+          npm -v
+          npm install
+          npm run build
 
 # pm2 restart wallet-app
