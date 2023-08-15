@@ -23,6 +23,6 @@ jobs:
         script: |
           cd ~/Wallet-App-API/
           git pull
-          npm install
-          npm run build
+          sudo npm install
+          sudo npm run build
 # pm2 restart wallet-app
