@@ -21,7 +21,7 @@ jobs:
         username: ${{ env.SERVER_USERNAME }}
         key: ${{ env.SSH_PRIVATE_KEY }}
         script: |
-          cd Wallet-App-API/  
+          cd ~/Wallet-App-API/
           git pull
           npm install
           npm run build
