@@ -9,9 +9,15 @@ env:
   SERVER_USERNAME: ubuntu
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
+
 jobs:
   build:
+
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
 
     steps:
     - name: Connect to server and deploy changes
@@ -23,6 +29,9 @@ jobs:
         script: |
           cd ~/Wallet-App-API/
           git pull
-          sudo npm install
-          sudo npm run build
+          /usr/bin/node -v
+          /usr/bin/npm -v
+          /usr/bin/npm install
+          /usr/bin/npm run build
+
 # pm2 restart wallet-app
