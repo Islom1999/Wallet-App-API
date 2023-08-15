@@ -5,13 +5,13 @@ on:
     branches: [ master ]
 
 env:
-  SERVER_HOST: 13.51.121.149
+  SERVER_HOST: 3.76.103.210
   SERVER_USERNAME: ubuntu
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
     - name: Connect to server and deploy changes
@@ -24,5 +24,5 @@ jobs:
           cd Wallet-App-API/  
           git pull
           npm install
-# npm run build
+          npm run build
 # pm2 restart wallet-app
