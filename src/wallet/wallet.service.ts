@@ -4,6 +4,7 @@ import { TransactionDto } from './dto/transaction.dto';
 import { QueryDto } from './dto/transactionQuery.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { CategoryQueryDto } from './dto/categoryQuery.dto';
+import { CategoryDto } from './dto/category.dto';
 
 @Injectable()
 export class WalletService {
@@ -54,7 +55,8 @@ export class WalletService {
                     lte: dateEnd,
                 },
                 walletId: wallet.id,
-                type: query.transactionType ? query.transactionType : undefined
+                type: query.transactionType ? query.transactionType : undefined,
+                categoryId: query.categoryId ? +query.categoryId : undefined
             },
             include: {
                 category: {
@@ -62,6 +64,9 @@ export class WalletService {
                         title: true,
                     },
                 }
+            },
+            orderBy: {
+                createdAt: 'desc'   // desc - bugungi birinchi chiqadi, asc - kechagi birinchi chiqadi
             },
         })
 
@@ -76,7 +81,8 @@ export class WalletService {
                     lte: dateEnd,
                 },
                 walletId: wallet.id,
-                type: query.transactionType ? query.transactionType : undefined
+                type: query.transactionType ? query.transactionType : undefined,
+                categoryId: query.categoryId ? +query.categoryId : undefined
             },
             _sum: {
                 amount: true, 
@@ -109,145 +115,65 @@ export class WalletService {
         }     
     }
 
-    async getAllIncomeTransaction(@Query() query: QueryDto, userId: number){
-        // const dateStart = new Date(query.dateStart)
-        // const dateEnd = new Date(query.dateEnd)
-        // const categoryId = query.categoryId
-
-        // let kun = dateEnd.getDate() + 1
-        // dateEnd.setDate(kun)
-
-        // const transaction = await await this.prismaService.transaction.findMany({
-        //     where: {
-        //         createdAt: {
-        //           gte: dateStart,
-        //           lte: dateEnd,
-        //         },
-        //         userId: +userId,
-        //         tushumId: +categoryId
-        //     },
-        //     include: {
-        //         user: {
-        //             select: {
-        //                 fullName: true,
-        //                 email: true,
-        //             },
-        //         },
-        //         tushum: {
-        //             select: {
-        //                 title: true,
-        //             },
-        //         }
-        //     },
-        // })
-
-        // if(Boolean(!transaction[0])){
-        //     throw new HttpException('transactionlar topilmadi', HttpStatus.NOT_FOUND);
-        // }
-
-        // let total = await this.prismaService.transaction.aggregate({
-        //     where: {
-        //         createdAt: {
-        //             gte: dateStart,
-        //             lte: dateEnd,
-        //         },
-        //         userId: +userId,
-        //         tushumId: +categoryId
-        //     },
-        //     _avg: {
-        //         amount: true,
-        //     },
-        //     _count: {
-        //         amount: true,
-        //     },
-        //     _sum: {
-        //         amount: true, 
-        //     }
-        // })
-
-        // const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
-
-        // return {code:200, message: "Barcha transactionlar", totalData, data:transaction}
-    }
-
-    async getAllExpenseTransaction(@Query() query: QueryDto, userId: number){
-        // const dateStart = new Date(query.dateStart)
-        // const dateEnd = new Date(query.dateEnd)
-        // const categoryId = query.categoryId
-
-        // let kun = dateEnd.getDate() + 1
-        // dateEnd.setDate(kun)
-
-        // const transaction = await await this.prismaService.transaction.findMany({
-        //     where: {
-        //         createdAt: {
-        //           gte: dateStart,
-        //           lte: dateEnd,
-        //         },
-        //         userId: +userId,
-        //         tushumId: +categoryId
-        //     },
-        //     include: {
-        //         user: {
-        //             select: {
-        //                 fullName: true,
-        //                 email: true,
-        //             },
-        //         },
-        //         tushum: {
-        //             select: {
-        //                 title: true,
-        //             },
-        //         }
-        //     },
-        // })
-
-        // if(Boolean(!transaction[0])){
-        //     throw new HttpException('transactionlar topilmadi', HttpStatus.NOT_FOUND);
-        // }
-
-        // let total = await this.prismaService.transaction.aggregate({
-        //     where: {
-        //         createdAt: {
-        //             gte: dateStart,
-        //             lte: dateEnd,
-        //         },
-        //         userId: +userId,
-        //         tushumId: +categoryId
-        //     },
-        //     _avg: {
-        //         amount: true,
-        //     },
-        //     _count: {
-        //         amount: true,
-        //     },
-        //     _sum: {
-        //         amount: true, 
-        //     }
-        // })
-
-        // const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
-
-        // return {code:200, message: "Barcha transactionlar", totalData, data:transaction}
-    }
-
+    // bitdi 
     async deleteTransaction(deleteId: string | number, userId: number) {
-        // deleteId = +deleteId
-        // const transaction = await this.prismaService.transaction.findUnique({where: {id: deleteId}})
-        // if(!transaction){
-        //     throw new HttpException('transaction topilmadi', HttpStatus.NOT_FOUND)
-        // }
-        // if(transaction.userId != userId){
-        //     throw new HttpException('Bu transaction sizga tegishli emas uni o\'chira olmaysiz', HttpStatus.BAD_REQUEST)
-        // }
-        // const deletetransaction = await this.prismaService.transaction.delete({where: {id:deleteId}})
-        // return {
-        //     code:200, 
-        //     message: 'transaction o\'chirildi',
-        //     data: deletetransaction
-        // }
+        deleteId = +deleteId
+
+        let wallet = await this.prismaService.wallet.findUnique({where: {userId: userId }})
+        if(!wallet){
+            wallet = await this.prismaService.wallet.create({data: {userId: userId}})
+        }
+
+        const transaction = await this.prismaService.transaction.findUnique({where: {id: deleteId}})
+        if(!transaction){
+            throw new HttpException('transaction topilmadi', HttpStatus.NOT_FOUND)
+        }
+        if(transaction.walletId != wallet.id){
+            throw new HttpException('Bu transaction sizga tegishli emas uni o\'chira olmaysiz', HttpStatus.BAD_REQUEST)
+        }
+        const deletetransaction = await this.prismaService.transaction.delete({where: {id:deleteId}})
+        return {
+            code:200, 
+            message: 'transaction o\'chirildi',
+            data: deletetransaction
+        }
     }
 
- 
+    // Admin Dashboard
+    async createTransactionCategory(categoryDto: CategoryDto) {
+        const category = await this.prismaService.category.create({data: {...categoryDto}})
+
+        return {
+            code:201,   
+            message: 'transaction yaratildi',
+            data: category
+        }     
+    }
+    
+    async updateTransactionCategory(categoryDto: CategoryDto, id: number | string) {
+        const category = await this.prismaService.category.update({
+            where: {id: +id},
+            data: {...categoryDto}
+        })
+
+        return {
+            code:200,   
+            message: 'transaction o\'zgartirildi',
+            data: category
+        }     
+    }
+
+    async deleteTransactionCategory(id: number | string) {
+        const category = await this.prismaService.category.delete({
+            where: {id: +id},
+        })
+
+        return {
+            code:200,   
+            message: 'transaction o\'chirildi',
+            data: category
+        }     
+    }
+
 }
  

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, UseGuards, HttpException, HttpStatus, UsePipes, ValidationPipe, Query, Delete, Param } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, HttpException, HttpStatus, UsePipes, ValidationPipe, Query, Delete, Param, Patch } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { TransactionDto } from './dto/transaction.dto';
 import { QueryDto } from './dto/transactionQuery.dto';
@@ -6,6 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { GetCurrentUserId } from 'src/decorators/get.userId';
 import { CategoryQueryDto } from './dto/categoryQuery.dto';
+import { CategoryDto } from './dto/category.dto';
 
 @Controller('wallet')
 export class WalletController {
@@ -34,20 +35,6 @@ export class WalletController {
     return await this.walletService.createTransaction(transactionDto, userId)
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/income/transaction/')
-  async getAllIncomeTransaction(@Query() query: QueryDto, @GetCurrentUserId() userId: number ){
-    const kirim = await this.walletService.getAllIncomeTransaction(query, userId);
-    return kirim
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/expense/transaction/')
-  async getAllExpenseTransaction(@Query() query: QueryDto, @GetCurrentUserId() userId: number ){
-    const kirim = await this.walletService.getAllExpenseTransaction(query, userId);
-    return kirim
-  }
-
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
   @Delete('/transaction/:id')
@@ -56,5 +43,31 @@ export class WalletController {
     @GetCurrentUserId() userId: number
   ) {
     return await this.walletService.deleteTransaction(id, userId)
+  }
+
+  // Admin Dashboard
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/admin/transaction/category')
+  async createTransactionCategory(@Body() categoryDto: CategoryDto){
+    return await this.walletService.createTransactionCategory(categoryDto); 
+  }
+
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/admin/transaction/category/:id')
+  async updateTransactionCategory(
+    @Body() categoryDto: CategoryDto,
+    @Param('id') id: number | string
+  ){
+    return await this.walletService.updateTransactionCategory(categoryDto, id);  
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('/admin/transaction/category/:id')
+  async deleteTransactionCategory(
+    @Param('id') id: number | string
+  ){
+    return await this.walletService.deleteTransactionCategory( id);  
   }
 }

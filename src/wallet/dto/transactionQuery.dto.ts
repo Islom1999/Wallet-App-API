@@ -11,4 +11,5 @@ export class QueryDto {
     dateEnd: string
 
     transactionType: TransactionType
+    categoryId: number
 }

@@ -53,7 +53,7 @@ model Category {
   id          Int             @id @default(autoincrement())
   title       String
   description String?
-
   type        TransactionType
+  
   Transaction Transaction[]
 }
