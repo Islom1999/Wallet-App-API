@@ -1,15 +1,15 @@
 import { IsNotEmpty, IsNumber, IsString } from "class-validator"
 
-export class ChiqimDto{
+export class TransactionDto{
     @IsString()
     @IsNotEmpty()
     title     : string
 
     @IsNumber()
     @IsNotEmpty()
-    amount : number
+    amount    : number
 
     @IsNumber()
     @IsNotEmpty()
-    xarajatId : number
+    tushumId  : number
 }

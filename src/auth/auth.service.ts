@@ -12,7 +12,7 @@ export class AuthService {
   constructor(private jwtService: JwtService, private prismaService: PrismaService) {}
 
   async register(register: RegisterDto): Promise<any> {
-    const user = await this.prismaService.user.findUnique({ where: { email: register.email } });
+    let user = await this.prismaService.user.findUnique({ where: { email: register.email } });
     if(user){
         throw new HttpException('User oldindan yaratilgan boshqa email kiriting', HttpStatus.BAD_REQUEST);
     }
@@ -24,7 +24,12 @@ export class AuthService {
     }
     const newUser = await this.prismaService.user.create({data})
     
-    return {status: 200, message: "User ro'yhatdan o'tdi", data: newUser};
+    const token = await this.generateToken({name: register.fullName, email: register.email});
+    user = await this.prismaService.user.update({data: {token}, where: {email: register.email} });
+
+    user.password = undefined
+
+    return {code: 201, message: "User ro'yhatdan o'tdi", data: user};
   }
 
   async login(loginDto: LoginDto): Promise<any> {
