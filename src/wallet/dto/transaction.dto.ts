@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { TransactionType } from "@prisma/client"
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator"
 
 export class TransactionDto{
     @IsString()
@@ -9,7 +10,11 @@ export class TransactionDto{
     @IsNotEmpty()
     amount    : number
 
+    @IsEnum(TransactionType)
+    @IsNotEmpty()
+    type : TransactionType
+
     @IsNumber()
     @IsNotEmpty()
-    tushumId  : number
+    categoryId: number
 }

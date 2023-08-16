@@ -1,16 +1,22 @@
 import { Injectable, HttpException, HttpStatus, Query, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { TransactionDto } from './dto/transaction.dto';
-import { QueryDto } from './dto/query.dto';
+import { QueryDto } from './dto/transactionQuery.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { CategoryQueryDto } from './dto/categoryQuery.dto';
 
 @Injectable()
 export class WalletService {
     constructor(private prismaService: PrismaService) { }
 
-    
-    async getAllTransactionCategory(){
-        const category = await this.prismaService.category.findMany()
+    // bitdi
+    async getAllTransactionCategory(categoryQueryDto: CategoryQueryDto){
+        const transactionType = categoryQueryDto.transactionType || undefined
+        const category = await this.prismaService.category.findMany({
+            where: {
+                type: transactionType
+            }
+        })
         .catch((error) => {
             if (error instanceof PrismaClientKnownRequestError) {
                 throw new HttpException('Prisma Error', HttpStatus.NOT_MODIFIED);
@@ -28,71 +34,79 @@ export class WalletService {
         }
     }
 
+    // bitdi
     async getAllTransaction(@Query() query: QueryDto, userId: number){
-        // const dateStart = new Date(query.dateStart)
-        // const dateEnd = new Date(query.dateEnd)
+        const dateStart = new Date(query.dateStart)
+        const dateEnd = new Date(query.dateEnd)
 
-        // let kun = dateEnd.getDate() + 1
-        // dateEnd.setDate(kun)
+        let kun = dateEnd.getDate() + 1
+        dateEnd.setDate(kun)
 
-        // const transaction = await await this.prismaService.transaction.findMany({
-        //     where: {
-        //         createdAt: {
-        //           gte: dateStart,
-        //           lte: dateEnd,
-        //         },
-        //         userId: +userId,
-        //     },
-        //     include: {
-        //         user: {
-        //             select: {
-        //                 fullName: true,
-        //                 email: true,
-        //             },
-        //         },
-        //         tushum: {
-        //             select: {
-        //                 title: true,
-        //             },
-        //         }
-        //     },
-        // })
+        let wallet = await this.prismaService.wallet.findUnique({where: {userId: userId }})
+        if(!wallet){
+            wallet = await this.prismaService.wallet.create({data: {userId: userId}})
+        }
 
-        // if(Boolean(!transaction[0])){
-        //     throw new HttpException('transactionlar topilmadi', HttpStatus.NOT_FOUND);
-        // }
+        const transaction = await await this.prismaService.transaction.findMany({
+            where: {
+                createdAt: {
+                    gte: dateStart,
+                    lte: dateEnd,
+                },
+                walletId: wallet.id,
+                type: query.transactionType ? query.transactionType : undefined
+            },
+            include: {
+                category: {
+                    select: {
+                        title: true,
+                    },
+                }
+            },
+        })
 
-        // let total = await this.prismaService.transaction.aggregate({
-        //     where: {
-        //         createdAt: {
-        //             gte: dateStart,
-        //             lte: dateEnd,
-        //         },
-        //         // userId: +userId,
-        //     },
-        //     _avg: {
-        //         amount: true,
-        //     },
-        //     _count: {
-        //         amount: true,
-        //     },
-        //     _sum: {
-        //         amount: true, 
-        //     }
-        // })
+        if(Boolean(!transaction[0])){
+            throw new HttpException('transactionlar topilmadi', HttpStatus.NOT_FOUND);
+        }
 
-        // const totalData = {totalAmount: total._sum.amount, totalCount: total._count.amount, totalAvg: total._avg.amount}
+        let total = await this.prismaService.transaction.aggregate({
+            where: {
+                createdAt: {
+                    gte: dateStart,
+                    lte: dateEnd,
+                },
+                walletId: wallet.id,
+                type: query.transactionType ? query.transactionType : undefined
+            },
+            _sum: {
+                amount: true, 
+            }
+        })
 
-        // return {code:200, message: "Barcha transactionlar", totalData, data:transaction}
+        const totalData = {totalAmount: total._sum.amount}
+
+        return {code:200, message: "Barcha transactionlar",totalData, data:transaction}
     }
 
+    // bitdi
     async createTransaction(transactionDto: TransactionDto, userId: number) {
-        // const newtransaction = await this.prismaService.transaction.create({data: {...transactionDto, userId}})
-        // return {
-        //     code:201, 
-        //     message: 'transaction yaratildi',
-        //     data: newtransaction
-        // }     
+        let wallet = await this.prismaService.wallet.findUnique({where: {userId: userId}}) 
+        if(!wallet){
+            wallet = await this.prismaService.wallet.create({data: {userId: userId}})
+        }
+        const category = await this.prismaService.category.findUnique({
+            where: {id: transactionDto.categoryId}
+        })
+        if(category.type !== transactionDto.type){
+            throw new HttpException('transaction type bilan category lar mos emas', HttpStatus.BAD_REQUEST)
+        }   
+        const newtransaction = await this.prismaService.transaction.create({data: {...transactionDto, walletId: wallet.id}})
+
+        return {
+            code:201,   
+            message: 'transaction yaratildi',
+            data: newtransaction
+        }     
     }
 
     async getAllIncomeTransaction(@Query() query: QueryDto, userId: number){
@@ -234,6 +248,6 @@ export class WalletService {
         // }
     }
 
-
+ 
 }
  

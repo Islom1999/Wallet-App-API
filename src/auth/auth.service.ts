@@ -23,6 +23,7 @@ export class AuthService {
         password,
     }
     const newUser = await this.prismaService.user.create({data})
+    const wallet = await this.prismaService.wallet.create({data: {userId: newUser.id}})
     
     const token = await this.generateToken({name: register.fullName, email: register.email});
     user = await this.prismaService.user.update({data: {token}, where: {email: register.email} });

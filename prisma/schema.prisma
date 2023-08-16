@@ -16,6 +16,7 @@ model User {
   email    String   @unique
   password String
   token    String?
+
   Wallet   Wallet[]
 }
 
@@ -31,16 +32,20 @@ model Transaction {
   description String?
   type        TransactionType
   createdAt   DateTime        @default(now())
+
   walletId    Int
   wallet      Wallet          @relation(fields: [walletId], references: [id])
+  categoryId  Int
+  category    Category        @relation(fields: [categoryId], references: [id]) 
 }
 
 model Wallet {
   id           Int           @id @default(autoincrement())
   balance      Float         @default(0)
-  currency     String
+  currency     String        @default("So'm")
+
   transactions Transaction[]
-  userId       Int
+  userId       Int           @unique
   user         User          @relation(fields: [userId], references: [id])
 }
 
@@ -48,5 +53,7 @@ model Category {
   id          Int             @id @default(autoincrement())
   title       String
   description String?
+
   type        TransactionType
+  Transaction Transaction[]
 }

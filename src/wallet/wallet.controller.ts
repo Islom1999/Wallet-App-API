@@ -1,10 +1,11 @@
 import { Body, Controller, Post, Get, UseGuards, HttpException, HttpStatus, UsePipes, ValidationPipe, Query, Delete, Param } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { TransactionDto } from './dto/transaction.dto';
-import { QueryDto } from './dto/query.dto';
+import { QueryDto } from './dto/transactionQuery.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { GetCurrentUserId } from 'src/decorators/get.userId';
+import { CategoryQueryDto } from './dto/categoryQuery.dto';
 
 @Controller('wallet')
 export class WalletController {
@@ -12,11 +13,12 @@ export class WalletController {
   
   @UseGuards(AuthGuard('jwt'))
   @Get('/transaction/category')
-  async getAllTransactionCategory(){
-    const category = await this.walletService.getAllTransactionCategory();
+  async getAllTransactionCategory(@Query() categoryQueryDto: CategoryQueryDto){
+    const category = await this.walletService.getAllTransactionCategory(categoryQueryDto);
     return category
   }
 
+  @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
   @Get('/transaction')
   async getAllTransaction(@Query() query: QueryDto, @GetCurrentUserId() userId: number ){
