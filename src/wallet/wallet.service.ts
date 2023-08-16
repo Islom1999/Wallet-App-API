@@ -34,7 +34,7 @@ export class WalletService {
                 data: category
             }
         } catch (error) {
-            throw new HttpException('serverda xatolik yoki yomon sorov', HttpStatus.GATEWAY_TIMEOUT )
+            console.log(error)
         }
     }
 
@@ -96,7 +96,7 @@ export class WalletService {
     
             return {code:200, message: "Barcha transactionlar",totalData, data:transaction}
         } catch (error) {
-            throw new HttpException('serverda xatolik yoki yomon sorov', HttpStatus.GATEWAY_TIMEOUT )
+            console.log(error)
         }
     }
 
@@ -120,7 +120,7 @@ export class WalletService {
                 data: newtransaction
             }     
         } catch (error) {
-            throw new HttpException('serverda xatolik yoki yomon sorov', HttpStatus.GATEWAY_TIMEOUT )
+            console.log(error)
         }
     }
 
@@ -147,7 +147,7 @@ export class WalletService {
                 data: deletetransaction
             }
         } catch (error) {
-            throw new HttpException('serverda xatolik yoki yomon sorov', HttpStatus.GATEWAY_TIMEOUT )
+            console.log(error)
         }
     }
 
@@ -162,7 +162,7 @@ export class WalletService {
                 data: category
             }     
         } catch (error) {
-            throw new HttpException('serverda xatolik yoki yomon sorov', HttpStatus.GATEWAY_TIMEOUT )
+            console.log(error)
         }
     }
     
@@ -179,7 +179,7 @@ export class WalletService {
                 data: category
             }     
         } catch (error) {
-            throw new HttpException('serverda xatolik yoki yomon sorov', HttpStatus.GATEWAY_TIMEOUT )
+            console.log(error)
         }
     }
 
@@ -195,7 +195,7 @@ export class WalletService {
                 data: category
             }     
         } catch (error) {
-            throw new HttpException('serverda xatolik yoki yomon sorov', HttpStatus.GATEWAY_TIMEOUT )
+            console.log(error)
         }
     }
 
