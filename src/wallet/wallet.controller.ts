@@ -9,11 +9,12 @@ import { CategoryQueryDto } from './dto/categoryQuery.dto';
 import { CategoryDto } from './dto/category.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags("Wallet service")
+
 @Controller('wallet')
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
   
+  @ApiTags("Wallet service")
   @UseGuards(AuthGuard('jwt'))
   @Get('/transaction/category')
   async getAllTransactionCategory(@Query() categoryQueryDto: CategoryQueryDto){
@@ -21,6 +22,7 @@ export class WalletController {
     return category
   }
 
+  @ApiTags("Wallet service")
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
   @Get('/transaction')
@@ -29,7 +31,7 @@ export class WalletController {
     return kirim
   }
 
-  
+  @ApiTags("Wallet service")
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
   @Post('/transaction/create')
@@ -37,6 +39,7 @@ export class WalletController {
     return await this.walletService.createTransaction(transactionDto, userId)
   }
 
+  @ApiTags("Wallet service")
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
   @Delete('/transaction/:id')
@@ -48,6 +51,7 @@ export class WalletController {
   }
 
   // Admin Dashboard
+  @ApiTags("Admin service - buni app ga ulamaysiz")
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
   @Post('/admin/transaction/category')
@@ -55,6 +59,7 @@ export class WalletController {
     return await this.walletService.createTransactionCategory(categoryDto); 
   }
 
+  @ApiTags("Admin service - buni app ga ulamaysiz")
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'))
   @Patch('/admin/transaction/category/:id')
@@ -65,6 +70,7 @@ export class WalletController {
     return await this.walletService.updateTransactionCategory(categoryDto, id);  
   }
 
+  @ApiTags("Admin service - buni app ga ulamaysiz")
   @UseGuards(AuthGuard('jwt'))
   @Delete('/admin/transaction/category/:id')
   async deleteTransactionCategory(
