@@ -5,7 +5,9 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { GetCurrentUserId } from 'src/decorators/get.userId';
 import { updateFullNameDto, updatePasswordDto } from './dto/update.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Auth")
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

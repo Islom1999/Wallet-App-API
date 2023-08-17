@@ -7,7 +7,9 @@ import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { GetCurrentUserId } from 'src/decorators/get.userId';
 import { CategoryQueryDto } from './dto/categoryQuery.dto';
 import { CategoryDto } from './dto/category.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Wallet service")
 @Controller('wallet')
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
