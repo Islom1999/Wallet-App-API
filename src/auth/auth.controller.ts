@@ -33,14 +33,6 @@ export class AuthController {
     return this.authService.logout(userId);
   }
 
-  @Post('protected')
-  @UseGuards(AuthGuard('jwt'))
-  async protectedRoute() {
-    return { 
-      message: 'Siz autentifikatsiyadan o\'tdingiz', 
-    };
-  }
-
   @Get('profile')
   @UseGuards(AuthGuard('jwt'))
   async getProfile( @GetCurrentUserId() userId: number ) {
